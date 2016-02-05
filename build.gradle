@@ -1,0 +1,31 @@
+group 'com.evokly'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+apply plugin: 'pmd'
+apply plugin: 'jacoco'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.apache.kafka:connect-api:0.9.0.0'
+    compile 'org.slf4j:slf4j-api:1.7.14'
+}
+
+checkstyle {
+    repositories {
+        mavenCentral()
+    }
+    configurations {
+        checkstyle
+    }
+    dependencies {
+        checkstyle 'com.puppycrawl.tools:checkstyle:6.12.1'
+    }
+}
