@@ -8,6 +8,10 @@ apply plugin: 'pmd'
 apply plugin: 'jacoco'
 
 
+processResources {
+    expand project.properties
+}
+
 repositories {
     mavenCentral()
 }

@@ -12,6 +12,7 @@ import org.apache.kafka.connect.source.SourceConnector;
 import java.util.List;
 import java.util.Map;
 
+import com.evokly.kafka.connect.mqtt.util.Version;
 
 /**
  *
@@ -19,7 +20,7 @@ import java.util.Map;
 public class MqttSourceConnector extends SourceConnector {
     @Override
     public String version() {
-        return null;
+        return Version.getVersion();
     }
 
     @Override
