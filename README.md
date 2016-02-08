@@ -14,4 +14,4 @@
 * generate API documentation: `./gradlew javadoc` - output `./build/docs/javadoc`
 
 ## License
-Copyright 2016 Evokly S.A., all rights reserved.
+See [LICENSE](LICENSE) file for License
