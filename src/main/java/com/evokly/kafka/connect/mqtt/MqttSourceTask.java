@@ -13,8 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Copyright 2016 Evokly S.A.
  *
- */
+ * <p>See LICENSE file for License
+ **/
 public class MqttSourceTask extends SourceTask {
     @Override
     public String version() {

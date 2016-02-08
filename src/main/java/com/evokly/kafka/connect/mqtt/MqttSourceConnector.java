@@ -6,17 +6,19 @@
 
 package com.evokly.kafka.connect.mqtt;
 
+import com.evokly.kafka.connect.mqtt.util.Version;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
 
 import java.util.List;
 import java.util.Map;
 
-import com.evokly.kafka.connect.mqtt.util.Version;
 
 /**
+ * Copyright 2016 Evokly S.A.
  *
- */
+ * <p>See LICENSE file for License
+ **/
 public class MqttSourceConnector extends SourceConnector {
     @Override
     public String version() {

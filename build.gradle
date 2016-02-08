@@ -33,3 +33,10 @@ checkstyle {
         checkstyle 'com.puppycrawl.tools:checkstyle:6.12.1'
     }
 }
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = true
+        html.enabled = false
+    }
+}
