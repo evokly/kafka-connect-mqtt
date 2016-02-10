@@ -57,11 +57,11 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
         connectOptions.setCleanSession(true);
         connectOptions.setKeepAliveInterval(30);
-        // connectOptions.setServerURIs(props.get(MqttSourceConstant.MQTT_BROKER_URLS).split(","));
+        connectOptions.setServerURIs(props.get(MqttSourceConstant.MQTT_BROKER_URLS).split(","));
 
         // Connect to Broker
         try {
-            mClient = new MqttClient(props.get(MqttSourceConstant.MQTT_BROKER_URLS), mMqttClientId,
+            mClient = new MqttClient("tcp://127.0.0.1:1883", mMqttClientId,
                     new MemoryPersistence());
             mClient.setCallback(this);
             mClient.connect(connectOptions);
