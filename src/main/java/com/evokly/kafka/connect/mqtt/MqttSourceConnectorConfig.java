@@ -1,37 +1,85 @@
+/**
+ * Copyright 2016 Evokly S.A.
+ * See LICENSE file for License
+ **/
+
 package com.evokly.kafka.connect.mqtt;
 
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * MqttSourceConnectorConfig is responsible for correct configuration management.
+ */
 public class MqttSourceConnectorConfig {
-    List<Map<String, String>> configs = new ArrayList<>();
-    Map<String, String> properties;
+    private static final Logger log = LoggerFactory.getLogger(MqttSourceConnector.class);
 
-    public MqttSourceConnectorConfig(Map<String, String> props) {
-        properties = props;
-        // @TODO make any validation / configuration checking
-        Integer taskSize = Integer.valueOf(props.get(MqttSourceConstant.CONNECTIONS));
+    List<Map<String, String>> mConfigs = new ArrayList<>();
+    Map<String, String> mProperties;
 
-        for (int i = 0; i < taskSize; i++) {
-            Map<String, String> config = new HashMap<>();
+    /**
+     * Transform process properties.
+     *
+     * @param properties associative array with properties to be process
+     */
+    public MqttSourceConnectorConfig(Map<String, String> properties) {
+        log.info("Initialize transform process properties");
 
-            config.put(MqttSourceConstant.KAFKA_TOPIC, getProp(i, MqttSourceConstant.KAFKA_TOPIC));
-            config.put(MqttSourceConstant.MQTT_BROKER_URLS, getProp(i, MqttSourceConstant.MQTT_BROKER_URLS));
-            config.put(MqttSourceConstant.MQTT_TOPIC, getProp(i, MqttSourceConstant.MQTT_TOPIC));
-            config.put(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE, getProp(i, MqttSourceConstant.MQTT_QUALITY_OF_SERVICE));
+        mProperties = properties;
 
-            configs.add(i, config);
+        Integer size = Integer.valueOf(properties.get(MqttSourceConstant.CONNECTIONS));
+
+        for (int i = 0; i < size; i++) {
+            mConfigs.add(i, new HashMap<>());
+
+            processProperty(i, MqttSourceConstant.KAFKA_TOPIC);
+            processProperty(i, MqttSourceConstant.MQTT_BROKER_URLS);
+            processProperty(i, MqttSourceConstant.MQTT_TOPIC);
+            processProperty(i, MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
         }
     }
 
-    private String getProp(Integer i, String key) {
-        return properties.get(MqttSourceConstant.PREFIX.replace("{}", String.valueOf(i)) + key);
+    /**
+     * Process property and save to configuration.
+     *
+     * @param index connection number
+     * @param key   field name
+     */
+    private void processProperty(Integer index, String key) {
+        log.info("Process property {}[{}]", key, index);
+
+        mConfigs.get(index).put(key, mProperties.get(
+                MqttSourceConstant.PREFIX.replace("{}", String.valueOf(index)) + key
+        ));
     }
 
+    /**
+     * Getter for configuration size.
+     *
+     * @return number of processed configurations
+     */
     public Integer size() {
-        return configs.size();
+        log.info("Get number of configurations.");
+
+        return mConfigs.size();
     }
 
-    public String getProperty(Integer i, String key) {
-        return configs.get(i).get(key);
+    /**
+     * Getter for configuration property.
+     *
+     * @param index connection index
+     * @param key   field name
+     *
+     * @return configuration value
+     */
+    public String getProperty(Integer index, String key) {
+        log.info("Get property {}[{}]", key, index);
+
+        return mConfigs.get(index).get(key);
     }
 }
