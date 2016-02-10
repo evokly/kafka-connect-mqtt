@@ -35,7 +35,8 @@ public class MqttSourceConnectorConfig {
         Integer size = Integer.valueOf(properties.get(MqttSourceConstant.CONNECTIONS));
 
         for (int i = 0; i < size; i++) {
-            mConfigs.add(i, new HashMap<>());
+            Map<String, String> config = new HashMap<>();
+            mConfigs.add(i, config);
 
             processProperty(i, MqttSourceConstant.KAFKA_TOPIC);
             processProperty(i, MqttSourceConstant.MQTT_BROKER_URLS);
