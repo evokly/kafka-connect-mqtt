@@ -147,7 +147,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         log.info("-------------------------------------------------");
         log.info("| Topic:" + topic);
-        log.info("| Message: " + new String(message.getPayload()));
+        log.info("| Message: " + new String(message.getPayload(), "UTF-8"));
         log.info("-------------------------------------------------");
     }
 }
