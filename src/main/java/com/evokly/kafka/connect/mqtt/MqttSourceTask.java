@@ -46,7 +46,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     }
 
     /**
-     * Start the Task.
+     * Start the task.
      *
      * @param props initial configuration
      */
@@ -78,9 +78,10 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
             mClient.subscribe(topic, qos);
 
-            log.info("MQTT subscribe to " + topic + " with QoS " + qos.toString());
+            log.info("[{}] Subscribe to '{}' with QoS '{}'", mMqttClientId, topic,
+                    qos.toString());
         } catch (MqttException e) {
-            log.error("MQTT subscribe failed! " + e);
+            log.error("[{}] Subscribe failed! ", mMqttClientId, e);
         }
     }
 
@@ -92,9 +93,9 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
         try {
             mClient.disconnect();
 
-            log.info("MQTT disconnected.");
+            log.info("[{}] Disconnected from Broker.", mMqttClientId);
         } catch (MqttException e) {
-            log.error("MQTT disconnecting failed!", e);
+            log.error("[{}] Disconnecting from Broker failed!", mMqttClientId, e);
         }
     }
 

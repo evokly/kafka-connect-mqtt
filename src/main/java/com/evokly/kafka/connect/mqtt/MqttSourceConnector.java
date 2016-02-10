@@ -38,7 +38,7 @@ public class MqttSourceConnector extends SourceConnector {
     }
 
     /**
-     * Start this Connector. This method will only be called on a clean Connector, i.e. it has
+     * Start this connector. This method will only be called on a clean Connector, i.e. it has
      * either just been instantiated and initialized or {@link #stop()} has been invoked.
      *
      * @param props configuration settings
@@ -50,7 +50,7 @@ public class MqttSourceConnector extends SourceConnector {
     }
 
     /**
-     * SourceTask implementation for this Connector.
+     * SourceTask implementation for this connector.
      *
      * @return SourceTask class instance
      */
