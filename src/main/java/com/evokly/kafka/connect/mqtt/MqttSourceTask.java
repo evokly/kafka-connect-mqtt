@@ -21,8 +21,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * MqttSourceTask is a Kafka Connect SourceTask implementation that reads
@@ -33,6 +35,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
     MqttClient mClient;
     String mMqttClientId = MqttClient.generateClientId();
+    Queue<MqttSourceTaskMessage> mQueue = new LinkedList<>();
 
     /**
      * Get the version of this task. Usually this should be the same as the corresponding
@@ -146,9 +149,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        log.info("-------------------------------------------------");
-        log.info("| Topic:" + topic);
-        log.info("| Message: " + new String(message.getPayload(), "UTF-8"));
-        log.info("-------------------------------------------------");
+        log.debug("[{}] New message in '{}' arrived.", mMqttClientId, topic);
+
+        this.mQueue.add(new MqttSourceTaskMessage(topic, message));
     }
 }
