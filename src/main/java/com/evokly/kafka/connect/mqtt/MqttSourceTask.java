@@ -55,6 +55,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public void start(Map<String, String> props) {
+        log.info("Start a MqttSourceTask");
+
         // Setup MQTT Client
         MqttConnectOptions connectOptions = new MqttConnectOptions();
 
@@ -93,6 +95,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public void stop() {
+        log.info("Stoping the MqttSourceTask");
+
         try {
             mClient.disconnect();
 
@@ -124,7 +128,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public void connectionLost(Throwable cause) {
-        log.info("MQTT connection lost!", cause);
+        log.error("MQTT connection lost!", cause);
     }
 
     /**

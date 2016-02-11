@@ -52,7 +52,7 @@ public class MqttSourceConnectorConfig {
      * @param key   field name
      */
     private void processProperty(Integer index, String key) {
-        log.info("Process property {}[{}]", key, index);
+        log.debug("Process property {}[{}]", key, index);
 
         mConfigs.get(index).put(key, mProperties.get(
                 MqttSourceConstant.PREFIX.replace("{}", String.valueOf(index)) + key
@@ -65,7 +65,7 @@ public class MqttSourceConnectorConfig {
      * @return number of processed configurations
      */
     public Integer size() {
-        log.info("Get number of configurations.");
+        log.debug("Get number of configurations.");
 
         return mConfigs.size();
     }
@@ -79,7 +79,7 @@ public class MqttSourceConnectorConfig {
      * @return configuration value
      */
     public String getProperty(Integer index, String key) {
-        log.info("Get property {}[{}]", key, index);
+        log.debug("Get property {}[{}]", key, index);
 
         return mConfigs.get(index).get(key);
     }
