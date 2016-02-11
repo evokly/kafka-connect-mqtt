@@ -34,7 +34,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     private static final Logger log = LoggerFactory.getLogger(MqttSourceConnector.class);
 
     MqttClient mClient;
-    String mMqttClientId = MqttClient.generateClientId();
+    String mMqttClientId;
     Queue<MqttSourceTaskMessage> mQueue = new LinkedList<>();
 
     /**
@@ -57,12 +57,28 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     public void start(Map<String, String> props) {
         log.info("Start a MqttSourceTask");
 
-        // Setup MQTT Client
+        mMqttClientId = props.get(MqttSourceConstant.MQTT_CLIENT_ID) != null
+                ? props.get(MqttSourceConstant.MQTT_CLIENT_ID) : MqttClient.generateClientId();
+
+        // Setup MQTT Connect Options
         MqttConnectOptions connectOptions = new MqttConnectOptions();
 
-        connectOptions.setCleanSession(true);
-        connectOptions.setKeepAliveInterval(30);
-        connectOptions.setServerURIs(props.get(MqttSourceConstant.MQTT_BROKER_URLS).split(","));
+        if (props.get(MqttSourceConstant.MQTT_CLEAN_SESSION) != null) {
+            connectOptions.setCleanSession(
+                    props.get(MqttSourceConstant.MQTT_CLEAN_SESSION).contains("true"));
+        }
+        if (props.get(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT) != null) {
+            connectOptions.setConnectionTimeout(
+                    Integer.parseInt(props.get(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT)));
+        }
+        if (props.get(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL) != null) {
+            connectOptions.setKeepAliveInterval(
+                    Integer.parseInt(props.get(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL)));
+        }
+        if (props.get(MqttSourceConstant.MQTT_SERVER_URIS) != null) {
+            connectOptions.setServerURIs(
+                    props.get(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
+        }
 
         // Connect to Broker
         try {

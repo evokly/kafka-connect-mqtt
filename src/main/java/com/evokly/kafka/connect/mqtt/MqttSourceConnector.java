@@ -73,14 +73,11 @@ public class MqttSourceConnector extends SourceConnector {
 
         for (int i = 0; i < mConfig.size(); i++) {
             HashMap<String, String> properties = new HashMap<>();
-            properties.put(MqttSourceConstant.KAFKA_TOPIC, mConfig.getProperty(i,
-                    MqttSourceConstant.KAFKA_TOPIC));
-            properties.put(MqttSourceConstant.MQTT_BROKER_URLS, mConfig.getProperty(i,
-                    MqttSourceConstant.MQTT_BROKER_URLS));
-            properties.put(MqttSourceConstant.MQTT_TOPIC, mConfig.getProperty(i,
-                    MqttSourceConstant.MQTT_TOPIC));
-            properties.put(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE, mConfig.getProperty(i,
-                    MqttSourceConstant.MQTT_QUALITY_OF_SERVICE));
+
+            for (Map.Entry<String, String> config : mConfig.getProperties(i).entrySet()) {
+                properties.put(config.getKey(), config.getValue());
+            }
+
             configs.add(properties);
         }
 

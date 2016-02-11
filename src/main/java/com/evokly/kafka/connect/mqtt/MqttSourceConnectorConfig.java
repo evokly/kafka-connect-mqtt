@@ -40,16 +40,20 @@ public class MqttSourceConnectorConfig {
             mConfigs.add(i, config);
 
             processProperty(i, MqttSourceConstant.KAFKA_TOPIC);
-            processProperty(i, MqttSourceConstant.MQTT_BROKER_URLS);
+            processProperty(i, MqttSourceConstant.MQTT_CLIENT_ID);
+            processProperty(i, MqttSourceConstant.MQTT_CLEAN_SESSION);
+            processProperty(i, MqttSourceConstant.MQTT_CONNECTION_TIMEOUT);
+            processProperty(i, MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL);
+            processProperty(i, MqttSourceConstant.MQTT_SERVER_URIS);
             processProperty(i, MqttSourceConstant.MQTT_TOPIC);
             processProperty(i, MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
         }
 
         for (Map<String, String> configs : mConfigs) {
+            log.info(" Connection #{}:", index++);
             for (Map.Entry<String, String> config : configs.entrySet()) {
-                log.info(" {}. {} - {}", index, config.getKey(), config.getValue());
+                log.info(" * {}={}", config.getKey(), config.getValue());
             }
-            index++;
         }
     }
 
@@ -62,9 +66,11 @@ public class MqttSourceConnectorConfig {
     private void processProperty(Integer index, String key) {
         log.debug("Process property {}[{}]", key, index);
 
-        mConfigs.get(index).put(key, mProperties.get(
-                MqttSourceConstant.PREFIX.replace("{}", String.valueOf(index)) + key
-        ));
+        String value = mProperties.get(MqttSourceConstant.PREFIX.replace("{}",
+                String.valueOf(index)) + key);
+        if (value != null) {
+            mConfigs.get(index).put(key, value);
+        }
     }
 
     /**
@@ -79,16 +85,15 @@ public class MqttSourceConnectorConfig {
     }
 
     /**
-     * Getter for configuration property.
+     * Getter for configuration properties.
      *
-     * @param index connection index
-     * @param key   field name
+     * @param index configuration index
      *
-     * @return configuration value
+     * @return configuration properties
      */
-    public String getProperty(Integer index, String key) {
-        log.debug("Get property {}[{}]", key, index);
+    public Map<String, String> getProperties(Integer index) {
+        log.debug("Get connection properties {}", index);
 
-        return mConfigs.get(index).get(key);
+        return mConfigs.get(index);
     }
 }
