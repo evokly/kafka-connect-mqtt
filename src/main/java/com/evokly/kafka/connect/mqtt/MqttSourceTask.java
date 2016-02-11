@@ -66,6 +66,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
         // Connect to Broker
         try {
+            // Address of the server to connect to, specified as a URI, is overridden using
+            // MqttConnectOptions#setServerURIs(String[]) bellow.
             mClient = new MqttClient("tcp://127.0.0.1:1883", mMqttClientId,
                     new MemoryPersistence());
             mClient.setCallback(this);
