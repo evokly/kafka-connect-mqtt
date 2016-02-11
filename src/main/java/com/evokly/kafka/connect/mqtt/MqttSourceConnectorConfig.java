@@ -32,6 +32,7 @@ public class MqttSourceConnectorConfig {
 
         mProperties = properties;
 
+        Integer index = 0;
         Integer size = Integer.valueOf(properties.get(MqttSourceConstant.CONNECTIONS));
 
         for (int i = 0; i < size; i++) {
@@ -42,6 +43,13 @@ public class MqttSourceConnectorConfig {
             processProperty(i, MqttSourceConstant.MQTT_BROKER_URLS);
             processProperty(i, MqttSourceConstant.MQTT_TOPIC);
             processProperty(i, MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
+        }
+
+        for (Map<String, String> configs : mConfigs) {
+            for (Map.Entry<String, String> config : configs.entrySet()) {
+                log.info(" {}. {} - {}", index, config.getKey(), config.getValue());
+            }
+            index++;
         }
     }
 
