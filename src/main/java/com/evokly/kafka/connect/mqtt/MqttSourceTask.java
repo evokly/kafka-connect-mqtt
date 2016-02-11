@@ -7,6 +7,7 @@ package com.evokly.kafka.connect.mqtt;
 
 import com.evokly.kafka.connect.mqtt.util.Version;
 
+import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 
@@ -21,6 +22,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,9 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     private static final Logger log = LoggerFactory.getLogger(MqttSourceConnector.class);
 
     MqttClient mClient;
+    String mKafkaTopic;
     String mMqttClientId;
-    Queue<MqttSourceTaskMessage> mQueue = new LinkedList<>();
+    Queue<MqttSourceInterceptMessage> mQueue = new LinkedList<>();
 
     /**
      * Get the version of this task. Usually this should be the same as the corresponding
@@ -59,6 +62,9 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
         mMqttClientId = props.get(MqttSourceConstant.MQTT_CLIENT_ID) != null
                 ? props.get(MqttSourceConstant.MQTT_CLIENT_ID) : MqttClient.generateClientId();
+
+        // Setup Kafka
+        mKafkaTopic = props.get(MqttSourceConstant.KAFKA_TOPIC);
 
         // Setup MQTT Connect Options
         MqttConnectOptions connectOptions = new MqttConnectOptions();
@@ -136,7 +142,26 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
-        return null;
+        log.trace("[{}] Polling new data if exists.", mMqttClientId);
+
+        if (mQueue.isEmpty()) {
+            // no message to process
+            return null;
+        }
+
+        List<SourceRecord> records = new ArrayList<>();
+
+        while (mQueue.peek() != null) {
+            MqttSourceInterceptMessage message = mQueue.poll();
+            log.debug("[{}] Polling new data from queue for '{}' topic.",
+                    mMqttClientId, mKafkaTopic);
+
+            records.add(new SourceRecord(null, null, mKafkaTopic, null,
+                    Schema.STRING_SCHEMA, message.getTopic(),
+                    Schema.BYTES_SCHEMA, message.getMessage()));
+        }
+
+        return records;
     }
 
     /**
@@ -171,8 +196,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        log.debug("[{}] New message in '{}' arrived.", mMqttClientId, topic);
+        log.info("[{}] New message on '{}' arrived.", mMqttClientId, topic);
 
-        this.mQueue.add(new MqttSourceTaskMessage(topic, message));
+        this.mQueue.add(new MqttSourceInterceptMessage(topic, message));
     }
 }
