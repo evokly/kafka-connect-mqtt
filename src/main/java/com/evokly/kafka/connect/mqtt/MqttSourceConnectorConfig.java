@@ -49,10 +49,12 @@ public class MqttSourceConnectorConfig {
             processProperty(i, MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
         }
 
-        for (Map<String, String> configs : mConfigs) {
-            log.info(" Connection #{}:", index++);
-            for (Map.Entry<String, String> config : configs.entrySet()) {
-                log.info(" * {}={}", config.getKey(), config.getValue());
+        if (log.isDebugEnabled()) {
+            for (Map<String, String> configs : mConfigs) {
+                log.debug(" Connection #{}:", index++);
+                for (Map.Entry<String, String> config : configs.entrySet()) {
+                    log.debug(" * {}={}", config.getKey(), config.getValue());
+                }
             }
         }
     }
@@ -92,7 +94,7 @@ public class MqttSourceConnectorConfig {
      * @return configuration properties
      */
     public Map<String, String> getProperties(Integer index) {
-        log.debug("Get connection properties {}", index);
+        log.debug("Get connection[{}] properties.", index);
 
         return mConfigs.get(index);
     }

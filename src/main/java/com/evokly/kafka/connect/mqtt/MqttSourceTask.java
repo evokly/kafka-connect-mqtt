@@ -196,7 +196,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        log.info("[{}] New message on '{}' arrived.", mMqttClientId, topic);
+        log.debug("[{}] New message on '{}' arrived.", mMqttClientId, topic);
 
         this.mQueue.add(new MqttSourceInterceptMessage(topic, message));
     }
