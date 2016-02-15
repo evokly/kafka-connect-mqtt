@@ -8,13 +8,20 @@ apply plugin: 'pmd'
 apply plugin: 'jacoco'
 
 
+processResources {
+    expand project.properties
+}
+
 repositories {
     mavenCentral()
+
+    maven { url "https://repo.eclipse.org/content/repositories/paho-releases/" }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'org.apache.kafka:connect-api:0.9.0.0'
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
     compile 'org.slf4j:slf4j-api:1.7.14'
 }
 
@@ -27,5 +34,12 @@ checkstyle {
     }
     dependencies {
         checkstyle 'com.puppycrawl.tools:checkstyle:6.12.1'
+    }
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = true
+        html.enabled = false
     }
 }

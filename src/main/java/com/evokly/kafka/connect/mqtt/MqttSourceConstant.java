@@ -1,0 +1,21 @@
+/**
+ * Copyright 2016 Evokly S.A.
+ * See LICENSE file for License
+ **/
+
+package com.evokly.kafka.connect.mqtt;
+
+public class MqttSourceConstant {
+    public static final String CONNECTIONS = "connections";
+    public static final String PREFIX = "connection[{}].";
+
+    public static final String KAFKA_TOPIC = "kafka.topic";
+
+    public static final String MQTT_CLIENT_ID = "mqtt.client_id";
+    public static final String MQTT_CLEAN_SESSION = "mqtt.clean_session";
+    public static final String MQTT_CONNECTION_TIMEOUT = "mqtt.connection_timeout";
+    public static final String MQTT_KEEP_ALIVE_INTERVAL = "mqtt.keep_alive_interval";
+    public static final String MQTT_SERVER_URIS = "mqtt.server_uris";
+    public static final String MQTT_TOPIC = "mqtt.topic";
+    public static final String MQTT_QUALITY_OF_SERVICE = "mqtt.qos";
+}
