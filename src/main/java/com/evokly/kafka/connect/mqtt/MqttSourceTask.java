@@ -145,8 +145,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
         log.trace("[{}] Polling new data if exists.", mMqttClientId);
 
         if (mQueue.isEmpty()) {
-            // no message to process
-            return null;
+            // block if no data is currently available
+            Thread.sleep(1000);
         }
 
         List<SourceRecord> records = new ArrayList<>();
