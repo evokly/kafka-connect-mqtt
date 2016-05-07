@@ -34,6 +34,7 @@
     </module>
 
     <module name="TreeWalker">
+        <module name="FileContentsHolder"/>
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
@@ -216,4 +217,5 @@
         </module>
         <module name="CommentsIndentation"/>
     </module>
+    <module name="SuppressionCommentFilter"/>
 </module>

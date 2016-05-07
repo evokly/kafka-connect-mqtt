@@ -50,6 +50,7 @@ public class MqttSourceConnectorConfig {
             processProperty(i, MqttSourceConstant.MQTT_SSL_CA_CERT);
             processProperty(i, MqttSourceConstant.MQTT_SSL_CERT);
             processProperty(i, MqttSourceConstant.MQTT_SSL_PRIV_KEY);
+            processProperty(i, MqttSourceConstant.MESSAGE_PROCESSOR);
         }
 
         if (log.isDebugEnabled()) {
