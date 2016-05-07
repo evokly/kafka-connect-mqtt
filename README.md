@@ -14,6 +14,7 @@
     * libs needs to be added to CLASSPATH:
         * `kafka-connect-mqtt-{project.version}.jar`
         * `org.eclipse.paho.client.mqttv3-1.0.2.jar`
+        * if used with ssl there are more.. (`./gradlew copyRuntimeLibs` copies all runtime libs to `./build/output/lib`)
 
 **For production:**
 

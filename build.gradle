@@ -44,3 +44,8 @@ tasks.withType(FindBugs) {
         html.enabled = false
     }
 }
+
+task copyRuntimeLibs(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+}
