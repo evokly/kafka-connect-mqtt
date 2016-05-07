@@ -74,11 +74,13 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
         String sslCert = props.get(MqttSourceConstant.MQTT_SSL_CERT);
         String sslPrivateKey = props.get(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
 
-        if (sslCa != null &&
-                sslCert != null &&
-                sslPrivateKey != null) {
+        if (sslCa != null
+                && sslCert != null
+                && sslPrivateKey != null) {
             try {
-                connectOptions.setSocketFactory(SslUtils.getSslSocketFactory(sslCa, sslCert, sslPrivateKey, ""));
+                connectOptions.setSocketFactory(
+                        SslUtils.getSslSocketFactory(sslCa, sslCert, sslPrivateKey, "")
+                );
             } catch (Exception e) {
                 log.info("[{}] error creating socketFactory", mMqttClientId);
                 e.printStackTrace();

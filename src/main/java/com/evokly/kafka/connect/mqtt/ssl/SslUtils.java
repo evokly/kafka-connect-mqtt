@@ -10,14 +10,23 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
-import java.io.FileReader;
-import java.io.IOException;
-import java.security.*;
-import java.security.cert.CertificateException;
 
 /**
  * Created by booncol on 07.04.2016.
@@ -32,9 +41,9 @@ public class SslUtils {
     /**
      * Create SSLSocketFactory.
      *
-     * @param caCrt CA
-     * @param crt Client certificate
-     * @param key Client key
+     * @param caCrt CA certificate filepath
+     * @param crt Client certificate filepath
+     * @param key Client key filepath
      * @param password Password
      *
      * @return SSLSocketFactory
@@ -50,7 +59,9 @@ public class SslUtils {
                 ? password.toCharArray() : "".toCharArray();
 
         // load client private key
-        PEMParser parser = new PEMParser(new FileReader(key));
+        PEMParser parser = new PEMParser(
+                new InputStreamReader(new FileInputStream(key), Charset.forName("UTF-8"))
+        );
 
         Object obj = parser.readObject();
         KeyPair keyPair;
@@ -69,8 +80,9 @@ public class SslUtils {
         certConverter.setProvider("BC");
 
         // load CA certificate
-        parser = new PEMParser(new FileReader(
-                caCrt));
+        parser = new PEMParser(
+                new InputStreamReader(new FileInputStream(caCrt), Charset.forName("UTF-8"))
+        );
         X509CertificateHolder caCert = (X509CertificateHolder) parser.readObject();
         parser.close();
 
@@ -85,8 +97,9 @@ public class SslUtils {
         tmf.init(caKs);
 
         // load client certificate
-        parser = new PEMParser(new FileReader(
-                crt));
+        parser = new PEMParser(
+                new InputStreamReader(new FileInputStream(crt), Charset.forName("UTF-8"))
+        );
 
         X509CertificateHolder cert = (X509CertificateHolder) parser.readObject();
         parser.close();
