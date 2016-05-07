@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -181,9 +182,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
             log.debug("[{}] Polling new data from queue for '{}' topic.",
                     mMqttClientId, mKafkaTopic);
 
-            records.add(new SourceRecord(null, null, mKafkaTopic, null,
-                    message.getTopicSchema(), message.getTopic(),
-                    message.getMessageSchema(), message.getMessage()));
+            Collections.addAll(records, message.getRecords(mKafkaTopic));
         }
 
         return records;

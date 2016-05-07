@@ -2,6 +2,7 @@ package com.evokly.kafka.connect.mqtt.sample;
 
 import com.evokly.kafka.connect.mqtt.MqttMessageProcessor;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.source.SourceRecord;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,33 +19,17 @@ public class DumbProcessor implements MqttMessageProcessor {
     private Object mTopic;
 
     @Override
-    public Schema getTopicSchema() {
-        log.debug("returning topic schema");
-        return Schema.STRING_SCHEMA;
-    }
-
-    @Override
-    public Object getTopic() {
-        log.debug("returning topic in form {}", mTopic);
-        return mTopic;
-    }
-
-    @Override
-    public Schema getMessageSchema() {
-        log.debug("returning message schema");
-        return Schema.BYTES_SCHEMA;
-    }
-
-    @Override
-    public Object getMessage() {
-        log.debug("returning message {}", mMessage.getPayload());
-        return mMessage.getPayload();
-    }
-
-    @Override
     public MqttMessageProcessor process(String topic, MqttMessage message) {
+        log.debug("processing data for topic: {}; with message {}", topic, message);
         this.mTopic = topic;
         this.mMessage = message;
         return this;
+    }
+
+    @Override
+    public SourceRecord[] getRecords(String kafkaTopic) {
+        return new SourceRecord[]{new SourceRecord(null, null, kafkaTopic, null,
+                Schema.STRING_SCHEMA, mTopic,
+                Schema.BYTES_SCHEMA, mMessage.getPayload())};
     }
 }
