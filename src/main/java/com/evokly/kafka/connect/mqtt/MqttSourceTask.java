@@ -5,6 +5,7 @@
 
 package com.evokly.kafka.connect.mqtt;
 
+import com.evokly.kafka.connect.mqtt.ssl.SslUtils;
 import com.evokly.kafka.connect.mqtt.util.Version;
 
 import org.apache.kafka.connect.data.Schema;
@@ -68,6 +69,24 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
         // Setup MQTT Connect Options
         MqttConnectOptions connectOptions = new MqttConnectOptions();
+
+        String sslCa = props.get(MqttSourceConstant.MQTT_SSL_CA_CERT);
+        String sslCert = props.get(MqttSourceConstant.MQTT_SSL_CERT);
+        String sslPrivateKey = props.get(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
+
+        if (sslCa != null
+                && sslCert != null
+                && sslPrivateKey != null) {
+            try {
+                connectOptions.setSocketFactory(
+                        SslUtils.getSslSocketFactory(sslCa, sslCert, sslPrivateKey, "")
+                );
+            } catch (Exception e) {
+                log.info("[{}] error creating socketFactory", mMqttClientId);
+                e.printStackTrace();
+                return;
+            }
+        }
 
         if (props.get(MqttSourceConstant.MQTT_CLEAN_SESSION) != null) {
             connectOptions.setCleanSession(

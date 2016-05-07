@@ -22,6 +22,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'org.apache.kafka:connect-api:0.9.0.0'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.54'
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
+    compile 'org.bouncycastle:bcpg-jdk15on:1.54'
+    compile 'commons-io:commons-io:2.4'
     compile 'org.slf4j:slf4j-api:1.7.14'
     testCompile 'org.slf4j:slf4j-simple:1.7.14'
 }
@@ -43,4 +47,9 @@ tasks.withType(FindBugs) {
         xml.enabled = true
         html.enabled = false
     }
+}
+
+task copyRuntimeLibs(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
 }

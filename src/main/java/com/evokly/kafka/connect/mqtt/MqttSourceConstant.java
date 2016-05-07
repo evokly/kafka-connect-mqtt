@@ -18,4 +18,7 @@ public class MqttSourceConstant {
     public static final String MQTT_SERVER_URIS = "mqtt.server_uris";
     public static final String MQTT_TOPIC = "mqtt.topic";
     public static final String MQTT_QUALITY_OF_SERVICE = "mqtt.qos";
+    public static final String MQTT_SSL_CA_CERT = "mqtt.ssl.ca_cert";
+    public static final String MQTT_SSL_CERT = "mqtt.ssl.cert";
+    public static final String MQTT_SSL_PRIV_KEY = "mqtt.ssl.key";
 }

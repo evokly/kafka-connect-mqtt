@@ -47,6 +47,9 @@ public class MqttSourceConnectorConfig {
             processProperty(i, MqttSourceConstant.MQTT_SERVER_URIS);
             processProperty(i, MqttSourceConstant.MQTT_TOPIC);
             processProperty(i, MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
+            processProperty(i, MqttSourceConstant.MQTT_SSL_CA_CERT);
+            processProperty(i, MqttSourceConstant.MQTT_SSL_CERT);
+            processProperty(i, MqttSourceConstant.MQTT_SSL_PRIV_KEY);
         }
 
         if (log.isDebugEnabled()) {
