@@ -21,4 +21,6 @@ public class MqttSourceConstant {
     public static final String MQTT_SSL_CA_CERT = "mqtt.ssl.ca_cert";
     public static final String MQTT_SSL_CERT = "mqtt.ssl.cert";
     public static final String MQTT_SSL_PRIV_KEY = "mqtt.ssl.key";
+
+    public static final String MESSAGE_PROCESSOR = "message_processor_class";
 }

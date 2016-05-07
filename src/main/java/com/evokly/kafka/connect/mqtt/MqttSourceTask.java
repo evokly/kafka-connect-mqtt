@@ -5,10 +5,11 @@
 
 package com.evokly.kafka.connect.mqtt;
 
+import static com.evokly.kafka.connect.mqtt.util.Utils.getConfiguredInstance;
+
 import com.evokly.kafka.connect.mqtt.ssl.SslUtils;
 import com.evokly.kafka.connect.mqtt.util.Version;
 
-import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 
@@ -39,7 +40,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     MqttClient mClient;
     String mKafkaTopic;
     String mMqttClientId;
-    Queue<MqttSourceInterceptMessage> mQueue = new LinkedList<>();
+    Queue<MqttMessageProcessor> mQueue = new LinkedList<>();
+    String mMessageProcessorClassName = "com.evokly.kafka.connect.mqtt.sample.DumbProcessor";
 
     /**
      * Get the version of this task. Usually this should be the same as the corresponding
@@ -66,6 +68,10 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
         // Setup Kafka
         mKafkaTopic = props.get(MqttSourceConstant.KAFKA_TOPIC);
+
+        // Setup message processor
+        mMessageProcessorClassName = props.get(MqttSourceConstant.MESSAGE_PROCESSOR);
+        log.debug("class for processing messages: {}", mMessageProcessorClassName);
 
         // Setup MQTT Connect Options
         MqttConnectOptions connectOptions = new MqttConnectOptions();
@@ -171,13 +177,13 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
         List<SourceRecord> records = new ArrayList<>();
 
         while (mQueue.peek() != null) {
-            MqttSourceInterceptMessage message = mQueue.poll();
+            MqttMessageProcessor message = mQueue.poll();
             log.debug("[{}] Polling new data from queue for '{}' topic.",
                     mMqttClientId, mKafkaTopic);
 
             records.add(new SourceRecord(null, null, mKafkaTopic, null,
-                    Schema.STRING_SCHEMA, message.getTopic(),
-                    Schema.BYTES_SCHEMA, message.getMessage()));
+                    message.getTopicSchema(), message.getTopic(),
+                    message.getMessageSchema(), message.getMessage()));
         }
 
         return records;
@@ -217,6 +223,9 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         log.debug("[{}] New message on '{}' arrived.", mMqttClientId, topic);
 
-        this.mQueue.add(new MqttSourceInterceptMessage(topic, message));
+        this.mQueue.add(
+                getConfiguredInstance(mMessageProcessorClassName, MqttMessageProcessor.class)
+                        .process(topic, message)
+        );
     }
 }
