@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * MqttSourceTask is a Kafka Connect SourceTask implementation that reads
@@ -41,7 +41,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     MqttClient mClient;
     String mKafkaTopic;
     String mMqttClientId;
-    Queue<MqttMessageProcessor> mQueue = new LinkedList<>();
+    BlockingQueue<MqttMessageProcessor> mQueue = new LinkedBlockingQueue<>();
     String mMessageProcessorClassName = "com.evokly.kafka.connect.mqtt.sample.DumbProcessor";
 
     /**
@@ -168,22 +168,12 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
      */
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
-        log.trace("[{}] Polling new data if exists.", mMqttClientId);
-
-        while (mQueue.isEmpty()) {
-            // block if no data is currently available
-            Thread.sleep(1000);
-        }
-
         List<SourceRecord> records = new ArrayList<>();
+        MqttMessageProcessor message = mQueue.take();
+        log.debug("[{}] Polling new data from queue for '{}' topic.",
+                mMqttClientId, mKafkaTopic);
 
-        while (mQueue.peek() != null) {
-            MqttMessageProcessor message = mQueue.poll();
-            log.debug("[{}] Polling new data from queue for '{}' topic.",
-                    mMqttClientId, mKafkaTopic);
-
-            Collections.addAll(records, message.getRecords(mKafkaTopic));
-        }
+        Collections.addAll(records, message.getRecords(mKafkaTopic));
 
         return records;
     }
