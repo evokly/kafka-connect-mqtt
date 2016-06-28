@@ -5,8 +5,6 @@
 
 package com.evokly.kafka.connect.mqtt;
 
-import static com.evokly.kafka.connect.mqtt.util.Utils.getConfiguredInstance;
-
 import com.evokly.kafka.connect.mqtt.ssl.SslUtils;
 import com.evokly.kafka.connect.mqtt.util.Version;
 
@@ -42,7 +40,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     String mKafkaTopic;
     String mMqttClientId;
     BlockingQueue<MqttMessageProcessor> mQueue = new LinkedBlockingQueue<>();
-    String mMessageProcessorClassName = "com.evokly.kafka.connect.mqtt.sample.DumbProcessor";
+    MqttSourceConnectorConfig mConfig;
 
     /**
      * Get the version of this task. Usually this should be the same as the corresponding
@@ -64,22 +62,23 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
     public void start(Map<String, String> props) {
         log.info("Start a MqttSourceTask");
 
-        mMqttClientId = props.get(MqttSourceConstant.MQTT_CLIENT_ID) != null
-                ? props.get(MqttSourceConstant.MQTT_CLIENT_ID) : MqttClient.generateClientId();
+        mConfig = new MqttSourceConnectorConfig(props);
+
+
+        mMqttClientId = mConfig.getString(MqttSourceConstant.MQTT_CLIENT_ID) != null
+                ? mConfig.getString(MqttSourceConstant.MQTT_CLIENT_ID)
+                : MqttClient.generateClientId();
 
         // Setup Kafka
-        mKafkaTopic = props.get(MqttSourceConstant.KAFKA_TOPIC);
+        mKafkaTopic = mConfig.getString(MqttSourceConstant.KAFKA_TOPIC);
 
-        // Setup message processor
-        mMessageProcessorClassName = props.get(MqttSourceConstant.MESSAGE_PROCESSOR);
-        log.debug("class for processing messages: {}", mMessageProcessorClassName);
 
         // Setup MQTT Connect Options
         MqttConnectOptions connectOptions = new MqttConnectOptions();
 
-        String sslCa = props.get(MqttSourceConstant.MQTT_SSL_CA_CERT);
-        String sslCert = props.get(MqttSourceConstant.MQTT_SSL_CERT);
-        String sslPrivateKey = props.get(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
+        String sslCa = mConfig.getString(MqttSourceConstant.MQTT_SSL_CA_CERT);
+        String sslCert = mConfig.getString(MqttSourceConstant.MQTT_SSL_CERT);
+        String sslPrivateKey = mConfig.getString(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
 
         if (sslCa != null
                 && sslCert != null
@@ -95,22 +94,16 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
             }
         }
 
-        if (props.get(MqttSourceConstant.MQTT_CLEAN_SESSION) != null) {
+        if (mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION)) {
             connectOptions.setCleanSession(
-                    props.get(MqttSourceConstant.MQTT_CLEAN_SESSION).contains("true"));
+                    mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION));
         }
-        if (props.get(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT) != null) {
-            connectOptions.setConnectionTimeout(
-                    Integer.parseInt(props.get(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT)));
-        }
-        if (props.get(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL) != null) {
-            connectOptions.setKeepAliveInterval(
-                    Integer.parseInt(props.get(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL)));
-        }
-        if (props.get(MqttSourceConstant.MQTT_SERVER_URIS) != null) {
-            connectOptions.setServerURIs(
-                    props.get(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
-        }
+        connectOptions.setConnectionTimeout(
+                mConfig.getInt(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT));
+        connectOptions.setKeepAliveInterval(
+                mConfig.getInt(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL));
+        connectOptions.setServerURIs(
+                mConfig.getString(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
 
         // Connect to Broker
         try {
@@ -128,8 +121,8 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
         // Setup topic
         try {
-            String topic = props.get(MqttSourceConstant.MQTT_TOPIC);
-            Integer qos = Integer.parseInt(props.get(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE));
+            String topic = mConfig.getString(MqttSourceConstant.MQTT_TOPIC);
+            Integer qos = mConfig.getInt(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
 
             mClient.subscribe(topic, qos);
 
@@ -213,8 +206,9 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
         log.debug("[{}] New message on '{}' arrived.", mMqttClientId, topic);
 
         this.mQueue.add(
-                getConfiguredInstance(mMessageProcessorClassName, MqttMessageProcessor.class)
-                        .process(topic, message)
+                mConfig.getConfiguredInstance(MqttSourceConstant.MESSAGE_PROCESSOR,
+                        MqttMessageProcessor.class)
+                    .process(topic, message)
         );
     }
 }

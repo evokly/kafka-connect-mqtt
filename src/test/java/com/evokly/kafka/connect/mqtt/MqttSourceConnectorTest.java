@@ -26,25 +26,16 @@ public class MqttSourceConnectorTest {
         mConnector = new MqttSourceConnector();
 
         mSourceProperties = new HashMap<>();
-        mSourceProperties.put(MqttSourceConstant.CONNECTIONS, "2");
 
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.KAFKA_TOPIC, "kafka_topic");
+        mSourceProperties.put(MqttSourceConstant.KAFKA_TOPIC, "kafka_topic");
 
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.MQTT_CLEAN_SESSION, "true");
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.MQTT_CLIENT_ID, "TesetClientId");
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.MQTT_CONNECTION_TIMEOUT, "15");
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL, "30");
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.MQTT_QUALITY_OF_SERVICE, "2");
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.MQTT_SERVER_URIS, "tcp://127.0.0.1:1883");
-        mSourceProperties.put(MqttSourceConstant.PREFIX.replace("{}", "0")
-                + MqttSourceConstant.MQTT_TOPIC, "mqtt_topic");
+        mSourceProperties.put(MqttSourceConstant.MQTT_CLEAN_SESSION, "true");
+        mSourceProperties.put(MqttSourceConstant.MQTT_CLIENT_ID, "TesetClientId");
+        mSourceProperties.put(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT, "15");
+        mSourceProperties.put(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL, "30");
+        mSourceProperties.put(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE, "2");
+        mSourceProperties.put(MqttSourceConstant.MQTT_SERVER_URIS, "tcp://127.0.0.1:1883");
+        mSourceProperties.put(MqttSourceConstant.MQTT_TOPIC, "mqtt_topic");
     }
 
     @Test
@@ -57,7 +48,7 @@ public class MqttSourceConnectorTest {
         mConnector.start(mSourceProperties);
         List<Map<String, String>> taskConfigs = mConnector.taskConfigs(1);
 
-        assertEquals(taskConfigs.size(), 2);
+        assertEquals(taskConfigs.size(), 1);
 
         assertEquals(taskConfigs.get(0).get(MqttSourceConstant.KAFKA_TOPIC), "kafka_topic");
         assertEquals(taskConfigs.get(0).get(MqttSourceConstant.MQTT_CLEAN_SESSION), "true");
@@ -69,14 +60,6 @@ public class MqttSourceConnectorTest {
                 "tcp://127.0.0.1:1883");
         assertEquals(taskConfigs.get(0).get(MqttSourceConstant.MQTT_TOPIC), "mqtt_topic");
 
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.KAFKA_TOPIC), null);
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.MQTT_CLEAN_SESSION), null);
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.MQTT_CLIENT_ID), null);
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT), null);
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL), null);
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE), null);
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.MQTT_SERVER_URIS), null);
-        assertEquals(taskConfigs.get(1).get(MqttSourceConstant.MQTT_TOPIC), null);
     }
 
 }

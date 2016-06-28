@@ -6,8 +6,6 @@
 package com.evokly.kafka.connect.mqtt;
 
 public class MqttSourceConstant {
-    public static final String CONNECTIONS = "connections";
-    public static final String PREFIX = "connection[{}].";
 
     public static final String KAFKA_TOPIC = "kafka.topic";
 
