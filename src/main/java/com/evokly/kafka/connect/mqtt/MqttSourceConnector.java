@@ -7,6 +7,7 @@ package com.evokly.kafka.connect.mqtt;
 
 import com.evokly.kafka.connect.mqtt.util.Version;
 
+import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
 
@@ -26,6 +27,7 @@ public class MqttSourceConnector extends SourceConnector {
     private static final Logger log = LoggerFactory.getLogger(MqttSourceConnector.class);
 
     MqttSourceConnectorConfig mConfig;
+    private Map<String, String> mConfigProperties;
 
     /**
      * Get the version of this connector.
@@ -46,6 +48,7 @@ public class MqttSourceConnector extends SourceConnector {
     @Override
     public void start(Map<String, String> props) {
         log.info("Start a MqttSourceConnector");
+        mConfigProperties = props;
         mConfig = new MqttSourceConnectorConfig(props);
     }
 
@@ -69,19 +72,10 @@ public class MqttSourceConnector extends SourceConnector {
      */
     @Override
     public List<Map<String, String>> taskConfigs(int maxTasks) {
-        ArrayList<Map<String, String>> configs = new ArrayList<>();
-
-        for (int i = 0; i < mConfig.size(); i++) {
-            HashMap<String, String> properties = new HashMap<>();
-
-            for (Map.Entry<String, String> config : mConfig.getProperties(i).entrySet()) {
-                properties.put(config.getKey(), config.getValue());
-            }
-
-            configs.add(properties);
-        }
-
-        return configs;
+        List<Map<String, String>> taskConfigs = new ArrayList<>(1);
+        Map<String, String> taskProps = new HashMap<>(mConfigProperties);
+        taskConfigs.add(taskProps);
+        return taskConfigs;
     }
 
     /**
@@ -90,5 +84,10 @@ public class MqttSourceConnector extends SourceConnector {
     @Override
     public void stop() {
         log.info("Stop the MqttSourceConnector");
+    }
+
+    @Override
+    public ConfigDef config() {
+        return MqttSourceConnectorConfig.config;
     }
 }

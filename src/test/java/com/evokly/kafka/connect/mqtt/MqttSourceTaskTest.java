@@ -13,10 +13,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MqttSourceTaskTest {
     private MqttSourceTask mTask;
+    private Map<String, String> mEmptyConfig = new HashMap<String, String>();
 
     /**
      * Several tests need similar objects created before they can run.
@@ -24,6 +27,7 @@ public class MqttSourceTaskTest {
     @Before
     public void beforeEach() {
         mTask = new MqttSourceTask();
+        mTask.start(mEmptyConfig);
     }
 
     @Test
