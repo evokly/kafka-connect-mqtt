@@ -5,10 +5,23 @@ plugins {
     id 'pmd'
     id 'jacoco'
     id 'net.researchgate.release' version '2.4.0'
+    id "com.jfrog.bintray" version '1.7'
+    id 'maven'
+    id 'maven-publish'
 }
 
 group 'com.evokly'
 
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'com.evokly'
+            artifactId 'kafka-connect-mqtt'
+            version '1.0'
+        }
+    }
+}
 
 
 ext {
@@ -60,4 +73,22 @@ tasks.withType(FindBugs) {
 task copyRuntimeLibs(type: Copy) {
     into "$buildDir/output/lib"
     from configurations.runtime
+}
+
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'maven'
+        name = 'kafka-connect-mqtt'
+        userOrg = 'evokly'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/evokly/kafka-connect-mqtt.git'
+        version {
+            name = '1.0'
+            vcsTag = '1.0'
+        }
+        publications = ['MyPublication']
+    }
 }

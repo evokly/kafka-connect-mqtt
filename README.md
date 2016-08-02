@@ -1,4 +1,4 @@
-# Mqtt to Apache Kafka Connect [![Build Status](https://travis-ci.org/evokly/kafka-connect-mqtt.svg?branch=master)](https://travis-ci.org/evokly/kafka-connect-mqtt)
+# Mqtt to Apache Kafka Connect [![Build Status](https://travis-ci.org/evokly/kafka-connect-mqtt.svg?branch=master)](https://travis-ci.org/evokly/kafka-connect-mqtt) [ ![Download](https://api.bintray.com/packages/evokly/maven/kafka-connect-mqtt/images/download.svg) ](https://bintray.com/evokly/maven/kafka-connect-mqtt/_latestVersion)
 
 ## Prerequisites
 * [Apache Kafka](https://kafka.apache.org/) (0.10.x version) is publish-subscribe messaging rethought as a distributed commit log.
