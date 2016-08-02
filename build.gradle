@@ -1,11 +1,15 @@
-group 'com.evokly'
-version '1.0-SNAPSHOT'
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'findbugs'
+    id 'pmd'
+    id 'jacoco'
+    id 'net.researchgate.release' version '2.4.0'
+}
 
-apply plugin: 'java'
-apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
-apply plugin: 'pmd'
-apply plugin: 'jacoco'
+group 'com.evokly'
+
+
 
 ext {
     kafkaVersion = '0.10.0.0'
