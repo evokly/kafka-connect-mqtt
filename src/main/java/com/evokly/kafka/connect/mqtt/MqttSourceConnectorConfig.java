@@ -56,6 +56,10 @@ public class MqttSourceConnectorConfig extends AbstractConfig {
                 .define(MqttSourceConstant.MQTT_SSL_PRIV_KEY, Type.STRING, null, Importance.LOW,
                         "cert priv key to use if using ssl",
                         "SSL", 3, ConfigDef.Width.LONG, "Key", MODE_SSL_RECOMMENDER)
+                .define(MqttSourceConstant.MQTT_USERNAME, Type.STRING, null, Importance.MEDIUM,
+                        "username to authenticate to mqtt broker")
+                .define(MqttSourceConstant.MQTT_PASSWORD, Type.STRING, null, Importance.MEDIUM,
+                        "password to authenticate to mqtt broker")
                 .define(MqttSourceConstant.MESSAGE_PROCESSOR, Type.CLASS,
                         DumbProcessor.class, Importance.HIGH,
                         "message processor to use");

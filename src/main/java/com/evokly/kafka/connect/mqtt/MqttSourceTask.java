@@ -105,6 +105,16 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
         connectOptions.setServerURIs(
                 mConfig.getString(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
 
+        if (mConfig.getString(MqttSourceConstant.MQTT_USERNAME) != null) {
+            connectOptions.setUserName(
+                    mConfig.getString(MqttSourceConstant.MQTT_USERNAME));
+        }
+
+        if (mConfig.getString(MqttSourceConstant.MQTT_PASSWORD) != null) {
+            connectOptions.setPassword(
+                    mConfig.getString(MqttSourceConstant.MQTT_PASSWORD).toCharArray());
+        }
+
         // Connect to Broker
         try {
             // Address of the server to connect to, specified as a URI, is overridden using
