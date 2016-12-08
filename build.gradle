@@ -72,7 +72,9 @@ tasks.withType(FindBugs) {
 
 task copyRuntimeLibs(type: Copy) {
     into "$buildDir/output/lib"
-    from configurations.runtime
+    from (configurations.runtime) {
+        exclude('connect-api*')
+    }
 }
 
 
