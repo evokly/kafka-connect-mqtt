@@ -7,18 +7,10 @@ package com.evokly.kafka.connect.mqtt;
 
 import com.evokly.kafka.connect.mqtt.ssl.SslUtils;
 import com.evokly.kafka.connect.mqtt.util.Version;
-
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
-
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,46 +66,9 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
 
         // Setup MQTT Connect Options
-        MqttConnectOptions connectOptions = new MqttConnectOptions();
-
-        String sslCa = mConfig.getString(MqttSourceConstant.MQTT_SSL_CA_CERT);
-        String sslCert = mConfig.getString(MqttSourceConstant.MQTT_SSL_CERT);
-        String sslPrivateKey = mConfig.getString(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
-
-        if (sslCa != null
-                && sslCert != null
-                && sslPrivateKey != null) {
-            try {
-                connectOptions.setSocketFactory(
-                        SslUtils.getSslSocketFactory(sslCa, sslCert, sslPrivateKey, "")
-                );
-            } catch (Exception e) {
-                log.info("[{}] error creating socketFactory", mMqttClientId);
-                e.printStackTrace();
-                return;
-            }
-        }
-
-        if (mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION)) {
-            connectOptions.setCleanSession(
-                    mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION));
-        }
-        connectOptions.setConnectionTimeout(
-                mConfig.getInt(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT));
-        connectOptions.setKeepAliveInterval(
-                mConfig.getInt(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL));
-        connectOptions.setServerURIs(
-                mConfig.getString(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
-
-        if (mConfig.getString(MqttSourceConstant.MQTT_USERNAME) != null) {
-            connectOptions.setUserName(
-                    mConfig.getString(MqttSourceConstant.MQTT_USERNAME));
-        }
-
-        if (mConfig.getString(MqttSourceConstant.MQTT_PASSWORD) != null) {
-            connectOptions.setPassword(
-                    mConfig.getString(MqttSourceConstant.MQTT_PASSWORD).toCharArray());
-        }
+        MqttConnectOptions connectOptions = buildMqttConnectOptions();
+        if (connectOptions == null)
+            return;
 
         // Connect to Broker
         try {
@@ -141,6 +96,50 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
         } catch (MqttException e) {
             log.error("[{}] Subscribe failed! ", mMqttClientId, e);
         }
+    }
+
+    private MqttConnectOptions buildMqttConnectOptions() {
+        MqttConnectOptions connectOptions = new MqttConnectOptions();
+
+        String sslCa = mConfig.getString(MqttSourceConstant.MQTT_SSL_CA_CERT);
+        String sslCert = mConfig.getString(MqttSourceConstant.MQTT_SSL_CERT);
+        String sslPrivateKey = mConfig.getString(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
+
+        if (sslCa != null
+                && sslCert != null
+                && sslPrivateKey != null) {
+            try {
+                connectOptions.setSocketFactory(
+                        SslUtils.getSslSocketFactory(sslCa, sslCert, sslPrivateKey, "")
+                );
+            } catch (Exception e) {
+                log.info("[{}] error creating socketFactory", mMqttClientId);
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        if (mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION)) {
+            connectOptions.setCleanSession(
+                    mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION));
+        }
+        connectOptions.setConnectionTimeout(
+                mConfig.getInt(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT));
+        connectOptions.setKeepAliveInterval(
+                mConfig.getInt(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL));
+        connectOptions.setServerURIs(
+                mConfig.getString(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
+
+        if (mConfig.getString(MqttSourceConstant.MQTT_USERNAME) != null) {
+            connectOptions.setUserName(
+                    mConfig.getString(MqttSourceConstant.MQTT_USERNAME));
+        }
+
+        if (mConfig.getString(MqttSourceConstant.MQTT_PASSWORD) != null) {
+            connectOptions.setPassword(
+                    mConfig.getString(MqttSourceConstant.MQTT_PASSWORD).toCharArray());
+        }
+        return connectOptions;
     }
 
     /**

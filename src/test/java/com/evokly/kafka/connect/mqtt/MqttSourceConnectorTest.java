@@ -5,14 +5,14 @@
 
 package com.evokly.kafka.connect.mqtt;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class MqttSourceConnectorTest {
     private MqttSourceConnector mConnector;
@@ -36,6 +36,7 @@ public class MqttSourceConnectorTest {
         mSourceProperties.put(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE, "2");
         mSourceProperties.put(MqttSourceConstant.MQTT_SERVER_URIS, "tcp://127.0.0.1:1883");
         mSourceProperties.put(MqttSourceConstant.MQTT_TOPIC, "mqtt_topic");
+        mSourceProperties.put(MqttSourceConstant.MQTT_AUTO_RECONNECT, "false");
     }
 
     @Test
@@ -59,7 +60,7 @@ public class MqttSourceConnectorTest {
         assertEquals(taskConfigs.get(0).get(MqttSourceConstant.MQTT_SERVER_URIS),
                 "tcp://127.0.0.1:1883");
         assertEquals(taskConfigs.get(0).get(MqttSourceConstant.MQTT_TOPIC), "mqtt_topic");
-
+        assertEquals(taskConfigs.get(0).get(MqttSourceConstant.MQTT_AUTO_RECONNECT), "false");
     }
 
 }
