@@ -5,8 +5,6 @@
 
 package com.evokly.kafka.connect.mqtt;
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.kafka.connect.source.SourceRecord;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.Before;
@@ -16,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class MqttSourceTaskTest {
     private MqttSourceTask mTask;
