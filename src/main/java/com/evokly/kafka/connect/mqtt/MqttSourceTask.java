@@ -67,79 +67,15 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
         // Setup MQTT Connect Options
         MqttConnectOptions connectOptions = buildMqttConnectOptions();
-        if (connectOptions == null)
+
+        if (connectOptions == null) {
+            log.warn("[{}] failure while processing connect configuration", mMqttClientId);
             return;
-
-        // Connect to Broker
-        try {
-            // Address of the server to connect to, specified as a URI, is overridden using
-            // MqttConnectOptions#setServerURIs(String[]) bellow.
-            mClient = new MqttClient("tcp://127.0.0.1:1883", mMqttClientId,
-                    new MemoryPersistence());
-            mClient.setCallback(this);
-            mClient.connect(connectOptions);
-
-            log.info("[{}] Connected to Broker", mMqttClientId);
-        } catch (MqttException e) {
-            log.error("[{}] Connection to Broker failed!", mMqttClientId, e);
         }
 
-        // Setup topic
-        try {
-            String topic = mConfig.getString(MqttSourceConstant.MQTT_TOPIC);
-            Integer qos = mConfig.getInt(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
+        connectToBroker(connectOptions);
 
-            mClient.subscribe(topic, qos);
-
-            log.info("[{}] Subscribe to '{}' with QoS '{}'", mMqttClientId, topic,
-                    qos.toString());
-        } catch (MqttException e) {
-            log.error("[{}] Subscribe failed! ", mMqttClientId, e);
-        }
-    }
-
-    private MqttConnectOptions buildMqttConnectOptions() {
-        MqttConnectOptions connectOptions = new MqttConnectOptions();
-
-        String sslCa = mConfig.getString(MqttSourceConstant.MQTT_SSL_CA_CERT);
-        String sslCert = mConfig.getString(MqttSourceConstant.MQTT_SSL_CERT);
-        String sslPrivateKey = mConfig.getString(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
-
-        if (sslCa != null
-                && sslCert != null
-                && sslPrivateKey != null) {
-            try {
-                connectOptions.setSocketFactory(
-                        SslUtils.getSslSocketFactory(sslCa, sslCert, sslPrivateKey, "")
-                );
-            } catch (Exception e) {
-                log.info("[{}] error creating socketFactory", mMqttClientId);
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        if (mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION)) {
-            connectOptions.setCleanSession(
-                    mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION));
-        }
-        connectOptions.setConnectionTimeout(
-                mConfig.getInt(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT));
-        connectOptions.setKeepAliveInterval(
-                mConfig.getInt(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL));
-        connectOptions.setServerURIs(
-                mConfig.getString(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
-
-        if (mConfig.getString(MqttSourceConstant.MQTT_USERNAME) != null) {
-            connectOptions.setUserName(
-                    mConfig.getString(MqttSourceConstant.MQTT_USERNAME));
-        }
-
-        if (mConfig.getString(MqttSourceConstant.MQTT_PASSWORD) != null) {
-            connectOptions.setPassword(
-                    mConfig.getString(MqttSourceConstant.MQTT_PASSWORD).toCharArray());
-        }
-        return connectOptions;
+        setUpMqttTopic();
     }
 
     /**
@@ -219,5 +155,80 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
                         MqttMessageProcessor.class)
                     .process(topic, message)
         );
+    }
+
+    private MqttConnectOptions buildMqttConnectOptions() {
+        MqttConnectOptions connectOptions = new MqttConnectOptions();
+
+        String sslCa = mConfig.getString(MqttSourceConstant.MQTT_SSL_CA_CERT);
+        String sslCert = mConfig.getString(MqttSourceConstant.MQTT_SSL_CERT);
+        String sslPrivateKey = mConfig.getString(MqttSourceConstant.MQTT_SSL_PRIV_KEY);
+
+        if (sslCa != null
+                && sslCert != null
+                && sslPrivateKey != null) {
+            try {
+                connectOptions.setSocketFactory(
+                        SslUtils.getSslSocketFactory(sslCa, sslCert, sslPrivateKey, "")
+                );
+            } catch (Exception e) {
+                log.info("[{}] error creating socketFactory", mMqttClientId);
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        if (mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION)) {
+            connectOptions.setCleanSession(
+                    mConfig.getBoolean(MqttSourceConstant.MQTT_CLEAN_SESSION));
+        }
+        connectOptions.setConnectionTimeout(
+                mConfig.getInt(MqttSourceConstant.MQTT_CONNECTION_TIMEOUT));
+        connectOptions.setKeepAliveInterval(
+                mConfig.getInt(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL));
+        connectOptions.setServerURIs(
+                mConfig.getString(MqttSourceConstant.MQTT_SERVER_URIS).split(","));
+
+        if (mConfig.getString(MqttSourceConstant.MQTT_USERNAME) != null) {
+            connectOptions.setUserName(
+                    mConfig.getString(MqttSourceConstant.MQTT_USERNAME));
+        }
+
+        if (mConfig.getString(MqttSourceConstant.MQTT_PASSWORD) != null) {
+            connectOptions.setPassword(
+                    mConfig.getString(MqttSourceConstant.MQTT_PASSWORD).toCharArray());
+        }
+        return connectOptions;
+    }
+
+    private void connectToBroker(MqttConnectOptions connectOptions) {
+        // Connect to Broker
+        try {
+            // Address of the server to connect to, specified as a URI, is overridden using
+            // MqttConnectOptions#setServerURIs(String[]) bellow.
+            mClient = new MqttClient("tcp://127.0.0.1:1883", mMqttClientId,
+                    new MemoryPersistence());
+            mClient.setCallback(this);
+            mClient.connect(connectOptions);
+
+            log.info("[{}] Connected to Broker", mMqttClientId);
+        } catch (MqttException e) {
+            log.error("[{}] Connection to Broker failed!", mMqttClientId, e);
+        }
+    }
+
+    private void setUpMqttTopic() {
+        // Setup topic
+        try {
+            String topic = mConfig.getString(MqttSourceConstant.MQTT_TOPIC);
+            Integer qos = mConfig.getInt(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
+
+            mClient.subscribe(topic, qos);
+
+            log.info("[{}] Subscribe to '{}' with QoS '{}'", mMqttClientId, topic,
+                    qos.toString());
+        } catch (MqttException e) {
+            log.error("[{}] Subscribe failed! ", mMqttClientId, e);
+        }
     }
 }
