@@ -40,6 +40,8 @@ public class MqttSourceConnectorConfig extends AbstractConfig {
                         "connection timeout to use")
                 .define(MqttSourceConstant.MQTT_KEEP_ALIVE_INTERVAL, Type.INT, 60, Importance.LOW,
                         "keepalive interval to use")
+                .define(MqttSourceConstant.MQTT_AUTO_RECONNECT, Type.BOOLEAN, false, Importance.LOW,
+                        "flag if client should reconnect when connection is lost")
                 .define(MqttSourceConstant.MQTT_SERVER_URIS, Type.STRING,
                         "tcp://localhost:1883", Importance.HIGH,
                         "mqtt server to connect to")
