@@ -72,7 +72,7 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 
 		connectToBroker(connectOptions);
 
-		setUpMqttTopic();
+		subscribeMqttTopic();
 	}
 
 	/**
@@ -197,27 +197,26 @@ public class MqttSourceTask extends SourceTask implements MqttCallback {
 	}
 
 	void reconnectToBroker() {
-
+		log.debug("[{}] Start reconnect Thread", mMqttClientId);
 		ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
 		exec.execute(new Runnable() {
 			@Override public void run() {
 				do {
 					try {
 						Thread.sleep(1000);
-						mClient.connect(buildMqttConnectOptions());
+						connectToBroker(buildMqttConnectOptions());
+						subscribeMqttTopic();
 
 						log.info("[{}] Reconnected to Broker", mMqttClientId);
-					} catch (MqttException e) {
-						log.error("[{}] Connection to Broker failed!", mMqttClientId, e);
 					} catch (InterruptedException e) {
 						log.error("[{}] Reconnect thread interruted", mMqttClientId, e);
 					}
-				} while (mClient.isConnected());
+				} while (!mClient.isConnected());
 			}
 		});
 	}
 
-	void setUpMqttTopic() {
+	void subscribeMqttTopic() {
 		try {
 			String topic = mConfig.getString(MqttSourceConstant.MQTT_TOPIC);
 			Integer qos = mConfig.getInt(MqttSourceConstant.MQTT_QUALITY_OF_SERVICE);
